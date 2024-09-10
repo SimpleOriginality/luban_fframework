@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Luban.CodeFormat;
 using Luban.Defs;
 using Luban.TemplateExtensions;
@@ -112,6 +113,24 @@ public abstract class TemplateCodeTargetBase : CodeTargetBase
     {
         var template = GetTemplate("enum");
         var tplCtx = CreateTemplateContext(template);
+
+
+        string baseType = "int";
+        string pattern = @"___(.+)$";
+        Match match = Regex.Match(@enum.Name, pattern);
+        if (match.Success)
+        {
+            baseType = match.Groups[1].Value;
+        }
+        if (@enum.Name.EndsWith("___"))
+        {
+            baseType = "int";
+            @enum.Name.TrimEnd('_');
+        }
+
+        @enum.Name = Regex.Replace(@enum.Name, pattern, string.Empty);
+
+
         var extraEnvs = new ScriptObject
         {
             { "__ctx", ctx},
@@ -122,6 +141,7 @@ public abstract class TemplateCodeTargetBase : CodeTargetBase
             { "__full_name_with_top_module", @enum.FullNameWithTopModule },
             { "__enum", @enum },
             { "__this", @enum },
+            { "__base_type", baseType },
             { "__code_style", CodeStyle},
         };
         tplCtx.PushGlobal(extraEnvs);

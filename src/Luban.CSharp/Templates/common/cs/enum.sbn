@@ -13,7 +13,7 @@
     {{~if __enum.is_flags~}}
     [System.Flags]
     {{~end~}}
-    public enum {{__name}}
+    public enum {{__name}} : {{__base_type}}
     {
         {{~ for item in items ~}}
 {{~if item.comment != '' ~}}
